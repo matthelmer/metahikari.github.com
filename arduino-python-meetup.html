@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MetaHikari</title>
+    <meta name="description" content="">
+    <meta name="author" content="Matt Helmer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="./theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="./theme/bootstrap.min.css" rel="stylesheet">
+    <link href="./theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="./theme/local.css" rel="stylesheet">
+    <link href="./theme/pygments.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href=".">MetaHikari</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+                    
+                                </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+            <div class='article'>
+        <div class="content-title">
+            <h1>Arduino + Python Meetup</h1>
+            Sun 03 February 2013
+
+by <a class="url fn" href="./author/matt-helmer.html">Matt Helmer</a>
+ 
+
+
+        </div>
+	
+        <div><h3>Geek Fest</h3>
+<p><img alt="True Hacker Dojo?" src="static/images/arduino_python_sign.jpg" />
+Whenever I'm in the mood for an interesting meetup, I simply fire up the 'ol <a href="https://www.google.com/calendar/embed?src=fvijvohm91uifvd9hratehf65k@group.calendar.google.com&amp;gsessionid=5uijVw3coaF4PGg5YsoZsg">IT Study Session calendar</a>.  If you are a programmer in Japan, this is one of the best resources to learn about tech-related talks, meetups...you name it.  The vast majority of the events are in Japanese, but you will probably also find the occasional English language meetup.  Being a Python programmer, I am generally interested in Python meetups, but recently I have also been intrigued by the Arduino, an open source microcontroller and related programming environment.  Arduino enables one, basically, to program electronics as one sees fit.  The sky is the limit <a href="http://code.google.com/p/arducopter/wiki/ArduCopter?tm=6">(literally)</a>.</p>
+<p>So, how could I not want to learn something that could potentially result in my own drone copter??</p>
+<p>I bought an Arduino Uno some months ago, but not knowing any C code, I kind of stuck it on the shelf and figured I would get around to it eventually.  Luckily, I discovered a meetup that would combine Arduino with Python, so I signed up.  A day spent programming a micro-controller in Akihabara, center of the geek universe, promised to be the geekiest thing I had ever done, ranking up there with my high school Mathlete days.  Arduino did not disappoint.</p>
+<p>The items needed were a laptop, Arduino controller and breadboard.  Apparently I was also supposed to bring a USB cable to connect my controller to my laptop, but I was able to borrow one from Kitagami sensei.</p>
+<p>In preparation for the event, I had to install the Arduino IDE on my laptop.  Since my laptop runs Debian Squeeze, I was worried about the installation process, but it turns out the Arduino IDE is now in the Debian package manager.  I simply clicked install, entered my password and had a new IDE.  Other preparation included downloading the <a href="http://pyserial.sourceforge.net/">pyserial</a> module, which allows Python to interact with my laptop serial port.</p>
+<h3>Turn on, Wire in, Read out</h3>
+<p><img alt="CERO" src="static/images/arduino_lab.JPG" />
+The shindig got started at 10:15am in CERO, a co-working space in Akihabara.  Having the event in Akihabara was a great idea, because cheap hardware was/is readily available, affording all of the particpants who forgot their Arduino kits, breadboards, etc. easy access to hardware.  Kitagami sensei put on his labcoat to indicate it was time to get to work and proceeded to explain the basics of the microcontroller, noting that the hardware side of Arduino is not so interesting, but things get considerably more exciting on the software side.  As it turned out, we were not going to be writing Python code and running it on the Arduino.  Arduino development is done in Arduino, using C code.  Rather, Python would be used to interact with and utilize the output of our Arduino.</p>
+<p>The project of the day was building a simple temperature sensor that would deliver an analog readout to Arduino, convert that to a temperature and tweet the result.  There are basically three cheap options for how to measure temperature.  One is a semiconductor sensor, or 半導体センサー (はんどうたいセンサー) in Japanese.  Another option is a thermocouple, or 熱電対 (ねつでんつい).  Thermocouples have a very long history of use, but are apparently more difficult to acquire.  The option we used was a thermistor, or サーミスタ, which is quite cheap.  It produces variable resistance, depending on the temperature in its surrounding environment.  Thermistors cost around 30 yen each.  Here is the specific model we used:
+<img alt="thermistor" src="static/images/thermistor_package.JPG" /></p>
+<p>The temperature is measured by the thermistor in degrees Kelvin, so part of the job of the C code was converting to celsius.  An example of an interesting use for this project could be monitoring how the temperature of a small room (as one often finds in Japanese apartments) changes when the Nth person enters the room.</p>
+<p>As the emphasis of the event was on becoming familiar with Arduino and not C, Kitagami sensei provided us with C code to copy and paste into our Arduino IDE.  The gist of the code is reading an analog output from the arduino 1000 times and averaging the value to reach a temperature to report.  My understanding is that this is a never-ending loop, so we get regular updates on this sample temperature.</p>
+<p>C (and Python) code provided by <a href="http://kitagami.org/Study/Arduinopy20130120/20130120.html">Kitagami.org</a></p>
+<p>We originally had an error in the C code.  The AD value is used to translate analog to digital.  We change a wave signal into a serials of numerical samples.  Kitagami sensei mentioned that this type of mathematics is called 離散数学(りさんすうがく), which I confirmed to be "dispersion mathematics" in English.  The AD (analog to digital converter) value was incorrectly defined as 10, instead of 19.53 mV/deg C.  This illustrated how tough hardware can be, as the value of 10 was for a different, but nearly the same, thermistor.  We used the MCP9701 thermal sensor.  The default Serial rate is 9600 in Arduino.  Since the rest of the system would be held up by a slow USB serial connect, we cranked things up to 115,200.  Arduino is apparently kind of slow at sampling, but sufficient for our hobbiest purposes.  A much faster sample rate would be required for mission critical applications, such as controlling brakes in a car.</p>
+<p>The Arduino was rigged using three lines, connecting the ground (GND), power (V_dd from thermistor, 5V) and "analog in" (V_out from thermistor).  In the configuration below, electricity is passing vertically, so as long as the lines are in the vertical column corresponding to the correct thermistor plugs, there should be no issues.  The breadboard looks like a coordinate system with rows and columns, so it is easy to align things.
+<img alt="arduino + breadboard + thermistor" src="static/images/arduino_wires.JPG" /></p>
+<p>I had some serious issues getting my laptop to compile the C code in the Arduino IDE.  I spent probably 1/3 of my time at the meetup trouble-shooting, before eventually getting things to work, although not with my Arduino Uno.  Kitagami sensei lent me an older Arduino board, called the Duemilanove.  I ran the command 'sudo arduino' to bring up my IDE, selected "Duemilanove" as my board type, and changed the baud rate to 115,200.  Of course, there was a lot of time spent toying around before I got it actually working.  The code compiled and I had a stream of output.  For interested parties, there is a summary of issues faced by Debian users <a href="http://playground.arduino.cc/Linux/Debian">here</a>
+<img alt="temperature output" src="static/images/arduino_screenshot.png" /></p>
+<h3>API Voodoo</h3>
+<p>Now that we had our C code working and the arduino was spitting out a continuous temperature update, it was time to get some Python code interacting with the serial module.  Data was received from '/dev/ttyUSB0', which is where the Arduino hookup was mounted via USB.  The Twitter API (thanks, Google!) then enabled us to post the temperature on twitter.  You can see the result here:
+<blockquote class="twitter-tweet"><p>sup y'all, current temperature in Akihabara is20.32</p>&mdash; matt helmer (@metahikari) <a href="https://twitter.com/metahikari/status/292899875467689985">January 20, 2013</a></blockquote></p>
+<h3>Wrap up</h3>
+<p>I had a lot of fun at this event.  Arduino is a very flexible tool, both in terms of functionality and educational value.  Kitagami sensei, bubbling with enthusiasm for Arduino, reminded me of my semi-absent-minded, but very fun high school physics teacher.  I hope to attend future events, as there was talk of incorporating Raspberry Pi into the Arduino mix.</p>
+<p>Of the 30 or so people who showed up, probably 26 were Apple users.  As such, the recommended preparation for the event was not really adequate for Linux users.  I should have done more homework in advance, as that could have prevented me from wasting an hour of trouble shooting.  I suppose next time I will need to do more preparation to ensure my hardware is compatible with my OS, but that's not such a big deal and is really my own fault.</p>
+<p>All in all, it was a good day and I learned about some new topics while getting my hands dirty with a little C code.</p></div>
+	
+        <hr>
+    	   
+        <h2>Comments</h2>
+		<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'metahikari'; 
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="./archives.html">Archives</a>
+                <li><a href="./tags.html">Tags</a>
+                <li><a href="http://metahikari.github.com/" rel="alternate">RSS feed</a></li>
+                            </ul>
+            </div>
+
+
+                        <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                                <li><a href="./category/about-me.html">About Me</a></li>
+                                <li><a href="./category/about-metahikari.html">About MetaHikari</a></li>
+                                <li><a href="./category/posts.html">Posts</a></li>
+                                   
+            </ul>
+            </div>
+            
+
+                        <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Links
+                </li>
+            
+                            <li><a href="http://docs.notmyidea.org/alexis/pelican/">Pelican</a></li>
+                            <li><a href="http://python.org">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org">Jinja2</a></li>
+                        </ul>
+            </div>
+            
+
+            
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href=".">MetaHikari</a> Copyright&nbsp;&copy;&nbsp;2012-2013&nbsp;Matt&nbsp;Helmer</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script>var _gaq=[['_setAccount','UA-38443136-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'))</script>
+ 
+</body>
+</html>
